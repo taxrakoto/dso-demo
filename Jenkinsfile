@@ -1,6 +1,7 @@
 pipeline {
   agent {
     kubernetes {
+      cloud 'Ambohitsirohitra'
       yamlFile 'build-agent.yaml'
       defaultContainer 'maven'
       idleMinutes 1
