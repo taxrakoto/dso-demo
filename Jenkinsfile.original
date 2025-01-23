@@ -2,8 +2,8 @@ pipeline {
   agent {
     kubernetes {
       cloud 'Ambohitsirohitra'
-      yamlFile 'nginx-pod.yaml'
-      defaultContainer 'nginx'
+      yamlFile 'build-agent.yaml'
+      defaultContainer 'maven'
       idleMinutes 1
     }
   }
@@ -12,8 +12,8 @@ pipeline {
       parallel {
         stage('Compile') {
           steps {
-            container('nginx') {
-              sh 'echo " tokony eto no m-build " '
+            container('maven') {
+              sh 'mvn compile'
             }
           }
         }
@@ -23,8 +23,8 @@ pipeline {
       parallel {
         stage('Unit Tests') {
           steps {
-            container('nginx') {
-              sh 'echo "mvn test" '
+            container('maven') {
+              sh 'mvn test'
             }
           }
         }
@@ -34,8 +34,8 @@ pipeline {
       parallel {
         stage('Create Jarfile') {
           steps {
-            container('nginx') {
-              sh 'echo "mvn package -DskipTests"'
+            container('maven') {
+              sh 'mvn package -DskipTests'
             }
           }
         }
