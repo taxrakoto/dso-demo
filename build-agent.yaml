@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   labels:
     app: spring-build-ci
+  name: jenkins-agent
 spec:
   containers:
     - name: maven
