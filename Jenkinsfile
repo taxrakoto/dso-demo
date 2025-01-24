@@ -13,7 +13,7 @@ pipeline {
         stage('Compile') {
           steps {
             container('maven') {
-              sh 'mvn compile'
+              sh 'cat nginx-pod.yaml && mvn compile'
             }
           }
         }
