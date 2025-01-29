@@ -39,21 +39,21 @@ pipeline {
             }
           }
         }
-        // stage ('OCI Image Bnp') {
-        //   agent {label 'docker'}
-        //   steps {
-        //     container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
-        //   }
-        // }
-      }
-    }
-    
-      stage ('build') {
+        stage ('OCI Image Bnp') {
           agent {label 'docker'}
           steps {
             container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
           }
+        }
       }
+    }
+    
+      // stage ('build') {
+      //     agent {label 'docker'}
+      //     steps {
+      //       container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
+      //     }
+      // }
    
 
     stage('Deploy to Dev') {
