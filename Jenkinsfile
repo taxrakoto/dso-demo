@@ -32,14 +32,14 @@ pipeline {
           steps {
             container ('maven'){
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
-                  sh 'mvn org.owasp:dependency-check-maven:check'
+                  sh 'mvn org.owasp:dependency-check-maven:check & cp target/dependency-check-report.html /home/jenkins/agent/report.html'
                 }
               }
              }
             post {
               always {
                 archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
-                dependencyCheckPublisher pattern: 'report.xml'
+                dependencyCheckPublisher pattern: '/home/jenkins/agent/report.html'
                }
             }
           }
