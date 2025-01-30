@@ -19,7 +19,7 @@ pipeline {
         }
       }
     }
-    stage('Test') {
+    stage('Static Analysis') {
       parallel {
         stage('Unit Tests') {
           steps {
@@ -28,6 +28,16 @@ pipeline {
             }
           }
         }
+        stage ('SCA'){
+          steps {
+            container ('maven'){
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
+                  sh 'mvn org.owasp:dependency-check-maven:check'
+                }
+            }
+          }
+        }
+
       }
     }
     stage('Package') {
@@ -39,23 +49,19 @@ pipeline {
             }
           }
         }
-        stage ('OCI Image Bnp') {
-          agent {label 'docker'}
-          steps {
-            container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
-          }
-        }
+//  build and publish to dockerhub phase
+        // stage ('OCI Image Bnp') {
+        //   agent {label 'docker'}   //specify a different pod to use
+        //   steps {
+        //     container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
+        //   }
+        // }
+//  build and publish to dockerhub phase        
       }
     }
     
-      // stage ('build') {
-      //     agent {label 'docker'}
-      //     steps {
-      //       container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
-      //     }
-      // }
-   
 
+   
     stage('Deploy to Dev') {
       steps {
         // TODO
