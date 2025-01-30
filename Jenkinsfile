@@ -34,16 +34,15 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
                   sh 'mvn org.owasp:dependency-check-maven:check'
                 }
+              }
+             }
+            post {
+              always {
+                archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
+                // dependencyCheckPublisher pattern: 'report.xml'
+               }
             }
           }
-        }
-        post {
-          always {
-            archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
-            // dependencyCheckPublisher pattern: 'report.xml'
-          }
-        }
-
       }
     }
     stage('Package') {
