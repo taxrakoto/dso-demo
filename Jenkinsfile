@@ -32,14 +32,14 @@ pipeline {
           steps {
             container ('maven'){
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
-                  sh 'mvn org.owasp:dependency-check-maven:check -DoutputDirectory=$WORKSPACE'
+                  sh 'mvn org.owasp:dependency-check-maven:check -Dformat=XML -DoutputDirectory=$WORKSPACE'
                 }
               }
              }
             post {
               always {
-                archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
-                dependencyCheckPublisher pattern: 'target/dependency-check-report.html'
+                archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.xml', fingerprint: true, onlyIfSuccessful: true
+                dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
                }
             }
           }
