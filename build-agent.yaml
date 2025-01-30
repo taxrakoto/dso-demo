@@ -11,9 +11,9 @@ spec:
       command:
         - cat
       tty: true
-      #volumeMounts:
-      #  - name: m2
-      #    mountPath: /root/.m2/
+      volumeMounts:
+       - name: m2
+         mountPath: /root/.m2/
     - name: docker-tools
       image: rmkanda/docker-tools:latest
       command:
@@ -44,3 +44,7 @@ spec:
   #  - name: trivycache
   #    hostPath:
   #      path: /tmp/trivycache/
+  volumes:
+    - name: m2
+      persistentVolumeClaim:
+        claimName: m2-cache
