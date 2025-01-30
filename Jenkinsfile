@@ -38,8 +38,8 @@ pipeline {
              }
             post {
               always {
-                archiveArtifacts allowEmptyArchive: true, artifacts:'dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
-                dependencyCheckPublisher pattern: 'dependency-check-report.html'
+                archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: true
+                dependencyCheckPublisher pattern: 'target/dependency-check-report.html'
                }
             }
           }
