@@ -43,6 +43,16 @@ pipeline {
                }
             }
           }
+// sonarqube test
+        stage ('Sonarqube') {
+          environment { scannerHome = tool 'SonarQube-Scanner'}
+          steps {
+              withSonarQubeEnv ('SonarQube') {
+              sh "${scannerHome}/bin/sonar-scanner"
+              }
+          }
+        }
+// end of sonar
       }
     }
     stage('Package') {
