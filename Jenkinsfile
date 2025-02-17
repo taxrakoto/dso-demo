@@ -8,17 +8,17 @@ pipeline {
     }
   }
   stages {
-    stage('Build') {
-      parallel {
-        stage('Compile') {
-          steps {
-            container('maven') {
-              sh 'cat nginx-pod.yaml && mvn compile'
-            }
-          }
-        }
-      }
-    }
+    // stage('Build') {
+    //   parallel {
+    //     stage('Compile') {
+    //       steps {
+    //         container('maven') {
+    //           sh 'cat nginx-pod.yaml && mvn compile'
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     stage('Static Analysis') {
       parallel {
         stage('Unit Tests') {
@@ -48,7 +48,10 @@ pipeline {
           environment { scannerHome = tool 'SonarQube-Scanner'}
           steps {
               withSonarQubeEnv ('SonarQube') {
-              sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=dso-key"
+              sh """
+              mvn compile
+              ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=dso-key
+              """
               }
           }
         }
@@ -75,7 +78,6 @@ pipeline {
       }
     }
     
-
    
     stage('Deploy to Dev') {
       steps {
