@@ -36,28 +36,85 @@ pipeline {
                 }
               }
              }
-            post {
-              always {
-                archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.xml', fingerprint: true, onlyIfSuccessful: true
-                dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-               }
-            }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// build archive: dependency ckeck report: uncomment to store report as build archive in jenkins server (use storage space)             
+            // post {
+            //   always {
+            //     archiveArtifacts allowEmptyArchive: true, artifacts:'target/dependency-check-report.xml', fingerprint: true, onlyIfSuccessful: true
+            //     dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+            //    }
+            // }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
           }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sonarqube test
         stage ('Sonarqube') {
           environment { scannerHome = tool 'SonarQube-Scanner'}
           steps {
               withSonarQubeEnv ('SonarQube') {
               sh """
-              mvn compile
-              ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=dso-key
+                mvn compile
+                ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=dso-key
               """
               }
           }
         }
 // end of sonar
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       }
     }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    stage ('Build image in a tarball') {
+          agent {label 'docker'}   //specify a different pod to use
+          steps {
+            container('kaniko') { 
+              sh """
+              /kaniko/executor \
+              -f `pwd`/Dockerfile \
+              -c `pwd` --insecure \
+              --skip-tls-verify \    
+              --tar-path=`pwd`/image.tar
+              --no-push
+              """
+              }
+          }
+        }
+
+    stage ('Image Analysis'){
+      agent {label 'docker'}
+      parallel {
+        stage ('lint') {
+          steps {
+            container ('dockle') { sh 'dockle --input `pwd`/image.tar'}
+          }
+        }
+        stage ('scan') {
+          steps { 
+            container ('trivy') { sh trivy --input `pwd`/image.tar'}
+          }
+        }
+      }
+    }
+
+
+    stage ('Push image to Registry') {
+          agent {label 'docker'}   //specify a different pod to use
+          steps {
+            container('kaniko') { 
+              sh """
+              /kaniko/executor \
+              -c `pwd` --insecure \
+              --skip-tls-verify \
+              --cache=true \
+              --tar-path=`pwd`/image.tar
+              --destination=docker.io/taxrakoto/dso-demo:latest\     
+              """
+              }
+          }
+        }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     stage('Package') {
       parallel {
         stage('Create Jarfile') {
@@ -68,7 +125,7 @@ pipeline {
           }
         }
 //  build and publish to dockerhub phase
-        // stage ('OCI Image Bnp') {
+        // stage ('Build and Push Image') {
         //   agent {label 'docker'}   //specify a different pod to use
         //   steps {
         //     container('kaniko') { sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/taxrakoto/dso-demo'}
@@ -78,7 +135,6 @@ pipeline {
       }
     }
     
-   
     stage('Deploy to Dev') {
       steps {
         // TODO
