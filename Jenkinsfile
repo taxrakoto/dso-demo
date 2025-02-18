@@ -73,7 +73,7 @@ pipeline {
               -f `pwd`/Dockerfile \
               -c `pwd` --insecure \
               --skip-tls-verify \    
-              --tar-path=`pwd`/image.tar
+              --tar-path=`pwd`/image.tar \
               --no-push
               """
               }
@@ -90,7 +90,7 @@ pipeline {
         }
         stage ('scan') {
           steps { 
-            container ('trivy') { sh trivy --input `pwd`/image.tar'}
+            container ('trivy') { sh 'trivy image --input `pwd`/image.tar'}
           }
         }
       }
@@ -106,8 +106,8 @@ pipeline {
               -c `pwd` --insecure \
               --skip-tls-verify \
               --cache=true \
-              --tar-path=`pwd`/image.tar
-              --destination=docker.io/taxrakoto/dso-demo:latest\     
+              --tar-path=`pwd`/image.tar \
+              --destination=docker.io/taxrakoto/dso-demo:latest     
               """
               }
           }
