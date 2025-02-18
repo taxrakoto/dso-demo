@@ -71,8 +71,8 @@ pipeline {
               sh """
               /kaniko/executor \
               -f `pwd`/Dockerfile \
-              -c `pwd` --insecure \
-              --skip-tls-verify \    
+              -c `pwd` \
+              --skip-tls-verify --insecure \
               --tar-path=`pwd`/image.tar \
               --no-push
               """
