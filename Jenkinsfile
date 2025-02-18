@@ -81,14 +81,15 @@ pipeline {
         }
 
     stage ('Image Analysis'){
-      agent {label 'docker'}
       parallel {
         stage ('lint') {
+          agent {label 'docker'}
           steps {
             container ('dockle') { sh 'dockle --input `pwd`/image.tar'}
           }
         }
         stage ('scan') {
+          agent {label 'docker'}
           steps { 
             container ('trivy') { sh 'trivy image --input `pwd`/image.tar'}
           }
