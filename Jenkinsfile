@@ -73,7 +73,7 @@ pipeline {
               -f `pwd`/Dockerfile \
               -c `pwd` \
               --skip-tls-verify --insecure \
-              --tar-path=`pwd`/image.tar \
+              --tar-path=/images/image.tar \
               --no-push
               """
               }
@@ -83,15 +83,15 @@ pipeline {
     stage ('Image Analysis'){
       parallel {
         stage ('lint') {
-          agent {label 'docker'}
+        agent {label 'docker'}
           steps {
-            container ('dockle') { sh 'dockle --input `pwd`/image.tar'}
+            container ('dockle') { sh 'dockle --input /images/image.tar'}
           }
         }
         stage ('scan') {
           agent {label 'docker'}
           steps { 
-            container ('trivy') { sh 'trivy image --input `pwd`/image.tar'}
+            container ('trivy') { sh 'trivy image --input /images/image.tar'}
           }
         }
       }
@@ -107,7 +107,7 @@ pipeline {
               -c `pwd` --insecure \
               --skip-tls-verify \
               --cache=true \
-              --tar-path=`pwd`/image.tar \
+              --tar-path=/images/image.tar \
               --destination=docker.io/taxrakoto/dso-demo:latest     
               """
               }
