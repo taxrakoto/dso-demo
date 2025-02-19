@@ -10,4 +10,10 @@ spec:
     imagePullPolicy: Always
     name: nginx
     resources: {}
-    
+    volumeMounts:
+    - name: cache
+      mountPath: /images
+  volumes:
+  - name: cache
+    persistentVolumeClaim:
+      claimName: image-cache
