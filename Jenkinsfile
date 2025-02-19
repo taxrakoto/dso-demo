@@ -108,7 +108,7 @@ pipeline {
               --skip-tls-verify \
               --cache=true \
               --tar-path=/images/image.tar \
-              --destination=docker.io/taxrakoto/dso-demo:latest     
+              --destination=docker.io/taxrakoto/dso-demo    
               """
               }
           }

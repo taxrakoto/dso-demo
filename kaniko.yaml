@@ -29,6 +29,20 @@ spec:
          - key: .dockerconfigjson
            path: config.json
 
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: trivy
+spec:
+  containers:
+  - image: bitnami/trivy:latest
+    imagePullPolicy: Always
+    name: trivy
+    command:
+    - sleep
+    args:
+    - 99d
 
 
 
