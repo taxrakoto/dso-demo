@@ -142,5 +142,17 @@ pipeline {
         sh "echo done"
       }
     }
+
+    stage('DAST') {
+      agent {label 'tools'}
+      environment { DEV_URL= http://dso-svc.staging.svc.cluster.local }
+      steps {
+        container('zap') {
+          sh 'zap-baseline.py -t ${DEV_URL}'
+        }
+      }
+    }
+
+
   }
 }
