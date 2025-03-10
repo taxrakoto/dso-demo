@@ -148,7 +148,7 @@ pipeline {
       environment { DEV_URL= 'http://dso-svc.staging.svc.cluster.local:8080' }
       steps {
         container('zap') {
-          sh 'zap-baseline.py -t ${DEV_URL}'
+          sh 'zap-baseline.py -t ${DEV_URL} -I'
         }
       }
     }
