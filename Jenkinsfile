@@ -99,7 +99,7 @@ pipeline {
 
 
     stage ('Push image to Registry') {
-          agent {label 'docker'}   //specify a different pod to use
+          agent {label 'docker-test'}   //specify a different pod to use
           steps {
             container('kaniko') { 
               sh """
@@ -148,7 +148,11 @@ pipeline {
       environment { DEV_URL= 'http://dso-svc.staging.svc.cluster.local:8080' }
       steps {
         container('zap') {
-          sh 'zap-baseline.py -t ${DEV_URL} -I'
+         script {
+          def result = sh(script: 'zap-baseline.py -t ${DEV_URL}', returnStatus: true)
+          echo "ZAP exit code: ${result}"
+          if (!(result in [0,2])) { error("Zap scan failed with FAIL")} //fail the pipeline only if exitCOde is not 0 or 2 
+         }
         }
       }
     }
